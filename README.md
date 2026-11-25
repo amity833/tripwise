@@ -10,9 +10,9 @@ An AI assistant that plans business trips. It finds flights and hotels, checks t
 
 | | |
 |---|---|
-| Web app | `TODO: https://<service>.onrender.com` |
-| Telegram bot | `TODO: https://t.me/<bot>` |
-| Demo video | `TODO: <unlisted link>` |
+| Web app | https://tripwise-n2ml.onrender.com |
+| Telegram bot | [@tripwise_travel_bot](https://t.me/tripwise_travel_bot) |
+| Demo video | [docs/demo.mp4](docs/demo.mp4) (about 4 minutes, no sound) |
 
 **Access:** no login, invite, or API key needed. On Telegram, open the bot in a private chat and press **Start**. The web app creates an anonymous session automatically.
 

@@ -199,7 +199,7 @@ Copy `.env.example` to `.env` and fill it in. `.env.example` contains no credent
 
 ### Deploy
 
-[render.yaml](render.yaml) is a Render blueprint using the [Dockerfile](Dockerfile). Set the secrets in the Render dashboard; the server registers the Telegram webhook on boot. A free uptime pinger on `/health` helps avoid cold starts.
+[render.yaml](render.yaml) is a Render blueprint using the [Dockerfile](Dockerfile). It deploys to Frankfurt; keep the service in the same region as the database, because each message makes several queries. Set the secrets in the Render dashboard; the server registers the Telegram webhook on boot. A free uptime pinger on `/health` helps avoid cold starts.
 
 ## Tests
 

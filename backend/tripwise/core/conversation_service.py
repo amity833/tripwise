@@ -116,16 +116,17 @@ class ConversationService:
         """The user's most recently active conversation, created if none exists."""
 
         async def job() -> Conversation:
-            await self.repo.ensure_user(user_id)
             return await self.repo.latest_conversation(user_id) or await self.repo.create_conversation(user_id)
 
         return await self._serial(f"user:{user_id}", job)
 
     async def list_conversations(self, user_id: str) -> list[ConversationSummary]:
         current = await self.current_conversation(user_id)
+        chats = await self.repo.list_conversations(user_id)
+        transcripts = await asyncio.gather(*(self.repo.get_messages(c.id) for c in chats))
         return [
-            ConversationSummary(c.id, _title(await self.repo.get_messages(c.id)), c.created_at, c.id == current.id)
-            for c in await self.repo.list_conversations(user_id)
+            ConversationSummary(c.id, _title(messages), c.created_at, c.id == current.id)
+            for c, messages in zip(chats, transcripts, strict=True)
         ]
 
     async def open_conversation(self, user_id: str, conversation_id: str) -> Conversation:
@@ -212,14 +213,14 @@ class ConversationService:
 
     async def _process(self, ctx: Ctx, text: str, channel: str, event_id: str | None) -> AssistantReply:
         repo = self.repo
-        await self._assert_owner(ctx.user_id, ctx.conversation_id)
+        conv = await self._assert_owner(ctx.user_id, ctx.conversation_id)
         if event_id:
             if await repo.claim_event(channel, event_id) == "duplicate":
                 stored = await repo.get_event_result(channel, event_id)
                 return AssistantReply.from_dict(stored) if stored else AssistantReply("Still working on that one, one moment.")
         try:
             await repo.touch_conversation(ctx.conversation_id)
-            reply = await self._run(ctx, text)
+            reply = await self._run(ctx, conv, text)
             if event_id:
                 await repo.complete_event(channel, event_id, reply.to_dict())
             return reply
@@ -228,7 +229,7 @@ class ConversationService:
                 await repo.release_event(channel, event_id)
             raise
 
-    async def _run(self, ctx: Ctx, raw_text: str) -> AssistantReply:
+    async def _run(self, ctx: Ctx, conv: Conversation, raw_text: str) -> AssistantReply:
         repo = self.repo
         text = raw_text.strip()
         if not text:
@@ -252,8 +253,6 @@ class ConversationService:
             await repo.append_messages(ctx.conversation_id, [{"role": "assistant", "text": r.message}])
             return AssistantReply(r.message, r.proposal)
 
-        conv = await repo.get_conversation(ctx.conversation_id)
-        assert conv is not None
         try:
             if conv.outage_armed:
                 await repo.set_outage(ctx.conversation_id, False)  # auto-clears after one failure

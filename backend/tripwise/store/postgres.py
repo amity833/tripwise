@@ -48,6 +48,13 @@ async def _init_connection(conn: asyncpg.Connection) -> None:
     await conn.set_type_codec("jsonb", encoder=json.dumps, decoder=json.loads, schema="pg_catalog")
 
 
+async def _skip_reset(_conn: asyncpg.Connection) -> None:
+    """
+    Replaces asyncpg's reset query, which costs an extra round trip after every pool operation. Nothing here changes
+    session state (no SET, LISTEN or session-level locks), and asyncpg still rolls back an open transaction.
+    """
+
+
 def _connection_args(url: str) -> tuple[str, Any]:
     """Strip libpq-only query params (asyncpg rejects some) and decide on TLS the same way the Node server did."""
     u = urlparse(url)
@@ -73,8 +80,10 @@ class PostgresRepo:
         while True:
             i += 1
             try:
+                # Reconnecting costs several round trips, so idle connections are kept until just before Neon's
+                # 5 minute auto-suspend.
                 pool = await asyncpg.create_pool(dsn, min_size=1, max_size=5, timeout=15, ssl=tls, init=_init_connection,
-                    max_inactive_connection_lifetime=30, command_timeout=20)
+                    reset=_skip_reset, max_inactive_connection_lifetime=240, command_timeout=20)
                 repo = cls(pool)
                 await repo.migrate()
                 return repo
@@ -104,8 +113,11 @@ class PostgresRepo:
         await self.pool.execute("SELECT 1")
 
     async def ensure_user(self, user_id: str) -> User:
-        await self.pool.execute("INSERT INTO users (id, created_at) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING", user_id, _ms())
-        r = await self.pool.fetchrow(f"SELECT {_USER_COLS} FROM users WHERE id=$1", user_id)
+        select = f"SELECT {_USER_COLS} FROM users WHERE id=$1"
+        r = await self.pool.fetchrow(select, user_id)
+        if r is None:
+            await self.pool.execute("INSERT INTO users (id, created_at) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING", user_id, _ms())
+            r = await self.pool.fetchrow(select, user_id)
         return User(user_id, int(r["created_at"]), int(r["last_seen_at"]))
 
     async def create_conversation(self, user_id: str) -> Conversation:
@@ -131,9 +143,12 @@ class PostgresRepo:
         return [_conv(r) for r in rows]
 
     async def touch_conversation(self, conversation_id: str) -> None:
-        user_id = await self.pool.fetchval("SELECT user_id FROM conversations WHERE id=$1", conversation_id)
-        if user_id is not None:
-            await self.pool.execute(f"UPDATE conversations SET active_at={_NEXT_ACTIVE} WHERE id=$3", _ms(), user_id, conversation_id)
+        await self.pool.execute(
+            """UPDATE conversations AS c
+               SET active_at = GREATEST($1::bigint, (SELECT max(active_at) FROM conversations WHERE user_id = c.user_id) + 1)
+               WHERE c.id = $2""",
+            _ms(), conversation_id,
+        )
 
     async def delete_conversation(self, conversation_id: str) -> None:
         async with self.pool.acquire() as conn, conn.transaction():
@@ -143,6 +158,11 @@ class PostgresRepo:
 
     async def claim_seat(self, user_id: str, max_users: int, idle_ms: int, now_ms: int) -> bool:
         cutoff = now_ms - idle_ms
+        # Common case, one round trip: refreshing a slot the user already holds doesn't change the count, so no lock.
+        if await self.pool.fetchval(
+            "UPDATE users SET last_seen_at=$3 WHERE id=$1 AND last_seen_at > $2 RETURNING id", user_id, cutoff, now_ms,
+        ):
+            return True
         async with self.pool.acquire() as conn, conn.transaction():
             await conn.execute("SELECT pg_advisory_xact_lock($1)", _SEAT_LOCK)
             seen = await conn.fetchval("SELECT last_seen_at FROM users WHERE id=$1", user_id)
@@ -160,8 +180,11 @@ class PostgresRepo:
         await self.pool.execute("UPDATE conversations SET outage_armed=$2 WHERE id=$1", conversation_id, armed)
 
     async def append_messages(self, conversation_id: str, msgs: list[LlmMessage]) -> None:
-        for m in msgs:
-            await self.pool.execute("INSERT INTO messages (conversation_id, message, created_at) VALUES ($1,$2,$3)", conversation_id, m, _ms())
+        # One pipelined, atomic batch: a tool call is never stored without its result.
+        await self.pool.executemany(
+            "INSERT INTO messages (conversation_id, message, created_at) VALUES ($1,$2,$3)",
+            [(conversation_id, m, _ms()) for m in msgs],
+        )
 
     async def get_messages(self, conversation_id: str) -> list[StoredMessage]:
         rows = await self.pool.fetch(f"SELECT {_MESSAGE_COLS} FROM messages WHERE conversation_id=$1 ORDER BY id", conversation_id)

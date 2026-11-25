@@ -3,6 +3,7 @@ services:
     name: tripwise
     runtime: docker
     plan: free
+    region: frankfurt                 # same region as the Neon database; cannot be changed after the service is created
     healthCheckPath: /health
     envVars:
       - { key: LLM_PROVIDER, value: gemini }

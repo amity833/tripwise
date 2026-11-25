@@ -1,0 +1,15 @@
+{
+  "name": "tripwise",
+  "private": true,
+  "workspaces": ["web"],
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "npm run build -w web && cd backend && .venv/bin/python -m tripwise",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build -w web",
+    "start": "cd backend && python -m tripwise",
+    "typecheck": "npm run typecheck -w web",
+    "lint": "cd backend && .venv/bin/ruff check .",
+    "test": "cd backend && .venv/bin/python -m pytest -q && cd .. && npm test -w web"
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "TLV": [
+    {
+      "name": "Central Budget Inn TLV",
+      "stars": 3,
+      "nightlyUsd": 83
+    },
+    {
+      "name": "Grand Plaza TLV",
+      "stars": 4,
+      "nightlyUsd": 135
+    },
+    {
+      "name": "Skyline Palace TLV",
+      "stars": 5,
+      "nightlyUsd": 210
+    }
+  ],
+  "BER": [
+    {
+      "name": "Central Budget Inn BER",
+      "stars": 3,
+      "nightlyUsd": 110
+    },
+    {
+      "name": "Grand Plaza BER",
+      "stars": 4,
+      "nightlyUsd": 180
+    },
+    {
+      "name": "Skyline Palace BER",
+      "stars": 5,
+      "nightlyUsd": 280
+    }
+  ],
+  "LON": [
+    {
+      "name": "Central Budget Inn LON",
+      "stars": 3,
+      "nightlyUsd": 165
+    },
+    {
+      "name": "Grand Plaza LON",
+      "stars": 4,
+      "nightlyUsd": 270
+    },
+    {
+      "name": "Skyline Palace LON",
+      "stars": 5,
+      "nightlyUsd": 420
+    }
+  ],
+  "NYC": [
+    {
+      "name": "Central Budget Inn NYC",
+      "stars": 3,
+      "nightlyUsd": 165
+    },
+    {
+      "name": "Grand Plaza NYC",
+      "stars": 4,
+      "nightlyUsd": 270
+    },
+    {
+      "name": "Skyline Palace NYC",
+      "stars": 5,
+      "nightlyUsd": 420
+    }
+  ],
+  "SFO": [
+    {
+      "name": "Central Budget Inn SFO",
+      "stars": 3,
+      "nightlyUsd": 165
+    },
+    {
+      "name": "Grand Plaza SFO",
+      "stars": 4,
+      "nightlyUsd": 270
+    },
+    {
+      "name": "Skyline Palace SFO",
+      "stars": 5,
+      "nightlyUsd": 420
+    }
+  ],
+  "PAR": [
+    {
+      "name": "Central Budget Inn PAR",
+      "stars": 3,
+      "nightlyUsd": 110
+    },
+    {
+      "name": "Grand Plaza PAR",
+      "stars": 4,
+      "nightlyUsd": 180
+    },
+    {
+      "name": "Skyline Palace PAR",
+      "stars": 5,
+      "nightlyUsd": 280
+    }
+  ],
+  "AMS": [
+    {
+      "name": "Central Budget Inn AMS",
+      "stars": 3,
+      "nightlyUsd": 110
+    },
+    {
+      "name": "Grand Plaza AMS",
+      "stars": 4,
+      "nightlyUsd": 180
+    },
+    {
+      "name": "Skyline Palace AMS",
+      "stars": 5,
+      "nightlyUsd": 280
+    }
+  ],
+  "MAD": [
+    {
+      "name": "Central Budget Inn MAD",
+      "stars": 3,
+      "nightlyUsd": 110
+    },
+    {
+      "name": "Grand Plaza MAD",
+      "stars": 4,
+      "nightlyUsd": 180
+    },
+    {
+      "name": "Skyline Palace MAD",
+      "stars": 5,
+      "nightlyUsd": 280
+    }
+  ],
+  "BCN": [
+    {
+      "name": "Central Budget Inn BCN",
+      "stars": 3,
+      "nightlyUsd": 110
+    },
+    {
+      "name": "Grand Plaza BCN",
+      "stars": 4,
+      "nightlyUsd": 180
+    },
+    {
+      "name": "Skyline Palace BCN",
+      "stars": 5,
+      "nightlyUsd": 280
+    }
+  ],
+  "ROM": [
+    {
+      "name": "Central Budget Inn ROM",
+      "stars": 3,
+      "nightlyUsd": 110
+    },
+    {
+      "name": "Grand Plaza ROM",
+      "stars": 4,
+      "nightlyUsd": 180
+    },
+    {
+      "name": "Skyline Palace ROM",
+      "stars": 5,
+      "nightlyUsd": 280
+    }
+  ],
+  "ATH": [
+    {
+      "name": "Central Budget Inn ATH",
+      "stars": 3,
+      "nightlyUsd": 83
+    },
+    {
+      "name": "Grand Plaza ATH",
+      "stars": 4,
+      "nightlyUsd": 135
+    },
+    {
+      "name": "Skyline Palace ATH",
+      "stars": 5,
+      "nightlyUsd": 210
+    }
+  ],
+  "LIS": [
+    {
+      "name": "Central Budget Inn LIS",
+      "stars": 3,
+      "nightlyUsd": 83
+    },
+    {
+      "name": "Grand Plaza LIS",
+      "stars": 4,
+      "nightlyUsd": 135
+    },
+    {
+      "name": "Skyline Palace LIS",
+      "stars": 5,
+      "nightlyUsd": 210
+    }
+  ],
+  "DXB": [
+    {
+      "name": "Central Budget Inn DXB",
+      "stars": 3,
+      "nightlyUsd": 165
+    },
+    {
+      "name": "Grand Plaza DXB",
+      "stars": 4,
+      "nightlyUsd": 270
+    },
+    {
+      "name": "Skyline Palace DXB",
+      "stars": 5,
+      "nightlyUsd": 420
+    }
+  ]
+}

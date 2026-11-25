@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: tripwise
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - { key: LLM_PROVIDER, value: gemini }
+      - { key: LLM_MODEL, value: gemini-3.5-flash-lite }
+      - { key: DEFAULT_TZ, value: Asia/Jerusalem }
+      - { key: DAILY_LLM_CAP, value: "2000" }
+      - { key: MAX_USERS, value: "10" }
+      - { key: MAX_CONVERSATIONS, value: "5" }
+      - { key: PUBLIC_URL, sync: false }              # https://<service>.onrender.com
+      - { key: GEMINI_API_KEY, sync: false }
+      - { key: DATABASE_URL, sync: false }            # Neon connection string
+      - { key: TELEGRAM_BOT_TOKEN, sync: false }      # production bot (NOT the dev bot)
+      - { key: TELEGRAM_WEBHOOK_SECRET, sync: false }

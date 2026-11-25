@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+*.log
+.venv
+__pycache__
+.pytest_cache
+.ruff_cache
+*.egg-info
+.env *
+
+# local only
+docs/CHANGELOG.md
+server/

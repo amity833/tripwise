@@ -1,0 +1,53 @@
+[project]
+name = "tripwise-backend"
+version = "0.1.0"
+description = "Tripwise: corporate travel assistant backend (web + Telegram)"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn>=0.32",
+  "httpx>=0.27",
+  "pydantic>=2.8",
+  "asyncpg>=0.30",
+  "python-dotenv>=1.0",
+  "tzdata>=2024.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.7"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["tripwise*"]
+
+[tool.setuptools.package-data]
+tripwise = ["data/*.json"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "TID251"]
+ignore = ["E501", "B008"]
+
+# Layering rule (replaces the old ESLint rule): core, tools, llm, store and data
+# must never import from channels/. TID251 flags it; only the wiring layer and
+# tests are allowed to.
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"tripwise.channels" = { msg = "Core layers must never import from channels/ (see docs/architecture.md)." }
+
+[tool.ruff.lint.per-file-ignores]
+"tripwise/channels/**" = ["TID251"]
+"tripwise/server.py" = ["TID251"]
+"tripwise/main.py" = ["TID251"]
+"tripwise/__main__.py" = ["TID251"]
+"tests/**" = ["TID251"]
